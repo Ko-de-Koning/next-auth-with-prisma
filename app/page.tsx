@@ -7,8 +7,21 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/db";
 
+function getTodos() {
+  return prisma.todo.findMany();
+}
+
+async function toggleTodo(id: string, complete: boolean) {
+  "use server";
+
+  await prisma.todo.update({ where: { id }, data: { complete } });
+
+  // console.log(id, complete);
+}
+
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  const todos = await getTodos();
 
   return (
     <>
@@ -28,6 +41,12 @@ export default async function Home() {
         <pre>{JSON.stringify(session)}</pre>
         <h2>Client Call</h2>
         <User />
+        <ul className="pl-4">
+          {todos.map((todo) => (
+            // <li key={todo.id}> {todo.title} </li> //first version
+            <TodoItem key={todo.id} {...todo} toggleTodo={toggleTodo} />
+          ))}
+        </ul>
       </main>
     </>
   );
