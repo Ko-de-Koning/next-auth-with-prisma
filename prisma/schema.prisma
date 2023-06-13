@@ -15,3 +15,10 @@ model User {
   password String
   name     String?
 }
+model Todo {
+  id String @id @default(uuid())
+  title String
+  complete Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ }
